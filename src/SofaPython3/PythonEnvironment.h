@@ -61,6 +61,8 @@ public:
     /// NB: can also be used for projects <projectDirectory>/*/python
     static void addPythonModulePathsForPlugins(const std::string& pluginsDirectory);
 
+    static void addPythonModulePathsForPluginsByName(const std::string& pluginName);
+
     /// set the content of sys.argv.
     static void setArguments(const std::string& filename,
                              const std::vector<std::string>& arguments=std::vector<std::string>(0));

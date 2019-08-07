@@ -52,6 +52,8 @@ namespace py = pybind11;
 #include "SceneLoaderPY3.h"
 using sofapython3::SceneLoaderPY3;
 
+#include <sofa/helper/system/PluginManager.h>
+
 namespace sofapython3
 {
 
@@ -282,6 +284,25 @@ void PythonEnvironment::addPythonModulePathsForPlugins(const std::string& plugin
             }
         }
     }
+}
+
+void PythonEnvironment::addPythonModulePathsForPluginsByName(const std::string& pluginName)
+{
+    std::map<std::string, sofa::helper::system::Plugin>& map = sofa::helper::system::PluginManager::getInstance().getPluginMap();
+    for( const auto& elem : map)
+    {
+        sofa::helper::system::Plugin p = elem.second;
+        if ( p.getModuleName() == pluginName )
+        {
+            std::string pluginLibraryPath = elem.first;
+            // moduleRoot should be 2 levels above the library (plugin_name/lib/plugin_name.so)
+            std::string moduleRoot = FileSystem::getParentDirectory(FileSystem::getParentDirectory(pluginLibraryPath));
+
+            addPythonModulePathsForPlugins(moduleRoot);
+            return;
+        }
+    }
+    msg_warning("PythonEnvironment") << pluginName << " not found in PluginManager's map.";
 }
 
 // some basic RAII stuff to handle init/termination cleanly
